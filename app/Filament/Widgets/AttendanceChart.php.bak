@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Filament\Widgets;
+
+use App\Models\Attendance;
+use Filament\Widgets\ChartWidget;
+
+class AttendanceChart extends ChartWidget
+{
+    protected ?string $heading = 'Grafik Kehadiran Guru';
+
+    protected int | string | array $columnSpan = 'full';
+
+    protected ?string $maxHeight = '300px';
+
+    // Default filter value
+    public ?string $filter = 'today';
+
+    protected function getFilters(): ?array
+    {
+        return [
+            'today' => 'Hari Ini',
+            'week' => '7 Hari Terakhir',
+            'month' => 'Bulan Ini',
+        ];
+    }
+
+    protected function getData(): array
+    {
+        $query = Attendance::query()->with('teacher');
+
+        // Set tanggal berdasarkan filter aktif
+        $now = now();
+
+        if ($this->filter === 'today') {
+            $query->whereDate('date', $now->toDateString());
+        } elseif ($this->filter === 'week') {
+            $query->whereBetween('date', [
+                $now->copy()->subDays(6)->toDateString(),
+                $now->toDateString(),
+            ]);
+        } elseif ($this->filter === 'month') {
+            $query->whereMonth('date', $now->month)
+                ->whereYear('date', $now->year);
+        }
+
+        // Ambil data hanya untuk status MASUK
+        $attendances = $query
+            ->where('status', Attendance::STATUS_MASUK)
+            ->selectRaw('teacher_id, count(*) as total')
+            ->groupBy('teacher_id')
+            ->get();
+
+        // Ambil nama guru & total masuk
+        $labels = $attendances->map(fn($item) => $item->teacher?->name ?? 'Tanpa Nama')->toArray();
+        $data = $attendances->pluck('total')->toArray();
+
+        return [
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Jumlah Masuk',
+                    'data' => $data,
+                ],
+            ],
+        ];
+    }
+
+    protected function getType(): string
+    {
+        return 'bar';
+    }
+}
