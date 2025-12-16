@@ -121,7 +121,7 @@
 
             <!-- Teks Utama -->
             <h1 class="text-6xl md:text-8xl font-bold text-white mb-4 drop-shadow-lg">
-                Silahkan Tap
+                Silahkan Tempelkan
             </h1>
             <h2 class="text-5xl md:text-7xl font-bold text-white mb-8 drop-shadow-lg">
                 Kartu Anda
