@@ -25,9 +25,10 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-// use Filament\Schemas\Components\Section;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class AttendanceResource extends Resource
 {
@@ -84,7 +85,6 @@ class AttendanceResource extends Resource
                     ->native(false)
                     ->nullable(),
 
-                // ->schema([
                 Toggle::make('is_late')
                     ->label('Terlambat?')
                     ->default(false)
@@ -98,33 +98,24 @@ class AttendanceResource extends Resource
                     ->helperText('Diisi otomatis oleh sistem saat check-in.')
                     ->disabled(),
 
-                // Section::make('Informasi Pulang Lebih Awal')
-                //     ->schema([
                 Toggle::make('is_early_leave')
                     ->label('Pulang Lebih Awal?')
                     ->default(false)
                     ->inline(false),
 
-                TextInput::make('early_leave_minutes')
-                    ->label('Menit Lebih Awal')
-                    ->numeric()
-                    ->suffix('menit')
-                    ->nullable()
-                    ->helperText('Diisi otomatis oleh sistem saat check-out.')
-                    ->disabled(),
-                // ])
-                // ->columns(2)
-                // ->collapsible(),
+                // TextInput::make('early_leave_minutes')
+                //     ->label('Menit Lebih Awal')
+                //     ->numeric()
+                //     ->suffix('menit')
+                //     ->nullable()
+                //     ->helperText('Diisi otomatis oleh sistem saat check-out.')
+                //     ->disabled(),
 
-                // Section::make('Keterangan')
-                //     ->schema([
                 TextInput::make('permission_note')
                     ->label('Keterangan Izin')
                     ->nullable()
                     ->columnSpanFull()
                     ->visible(fn($get) => $get('status') === 'izin'),
-                // ])
-                // ->collapsible(),
             ]);
     }
 
@@ -165,6 +156,7 @@ class AttendanceResource extends Resource
                     ->falseIcon('heroicon-o-check-circle')
                     ->trueColor('danger')
                     ->falseColor('success'),
+
                 TextEntry::make('late_minutes')
                     ->label('Menit Terlambat')
                     ->suffix(' menit')
@@ -178,11 +170,11 @@ class AttendanceResource extends Resource
                     ->falseIcon('heroicon-o-check-circle')
                     ->trueColor('warning')
                     ->falseColor('success'),
-                TextEntry::make('early_leave_minutes')
-                    ->label('Menit Lebih Awal')
-                    ->suffix(' menit')
-                    ->placeholder('-')
-                    ->color('warning'),
+                // TextEntry::make('early_leave_minutes')
+                //     ->label('Menit Lebih Awal')
+                //     ->suffix(' menit')
+                //     ->placeholder('-')
+                //     ->color('warning'),
 
                 TextEntry::make('permission_note')
                     ->label('Keterangan Izin')
@@ -221,14 +213,6 @@ class AttendanceResource extends Resource
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->iconColor('success'),
 
-                TextColumn::make('check_out')
-                    ->label('Jam Pulang')
-                    ->time('H:i:s')
-                    ->sortable()
-                    ->placeholder('-')
-                    ->icon('heroicon-o-arrow-left-on-rectangle')
-                    ->iconColor('danger'),
-
                 IconColumn::make('is_late')
                     ->label('Telat')
                     ->boolean()
@@ -237,33 +221,41 @@ class AttendanceResource extends Resource
                     ->trueColor('danger')
                     ->falseColor('success'),
 
-                TextColumn::make('late_minutes')
-                    ->label('Menit Telat')
-                    ->numeric()
+                TextColumn::make('check_out')
+                    ->label('Jam Pulang')
+                    ->time('H:i:s')
                     ->sortable()
                     ->placeholder('-')
-                    ->suffix(' mnt')
-                    ->color('danger')
-                    ->weight('medium'),
+                    ->icon('heroicon-o-arrow-left-on-rectangle')
+                    ->iconColor('danger'),
 
-                IconColumn::make('is_early_leave')
-                    ->label('Pulang Awal')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-exclamation-circle')
-                    ->falseIcon('heroicon-o-check-circle')
-                    ->trueColor('warning')
-                    ->falseColor('success')
-                    ->toggleable(),
+                // TextColumn::make('late_minutes')
+                //     ->label('Menit Telat')
+                //     ->numeric()
+                //     ->sortable()
+                //     ->placeholder('-')
+                //     ->suffix(' mnt')
+                //     ->color('danger')
+                //     ->weight('medium'),
 
-                TextColumn::make('early_leave_minutes')
-                    ->label('Menit Lebih Awal')
-                    ->numeric()
-                    ->sortable()
-                    ->placeholder('-')
-                    ->suffix(' mnt')
-                    ->color('warning')
-                    ->weight('medium')
-                    ->toggleable(),
+                // IconColumn::make('is_early_leave')
+                //     ->label('Pulang Awal')
+                //     ->boolean()
+                //     ->trueIcon('heroicon-o-exclamation-circle')
+                //     ->falseIcon('heroicon-o-check-circle')
+                //     ->trueColor('warning')
+                //     ->falseColor('success')
+                //     ->toggleable(),
+
+                // TextColumn::make('early_leave_minutes')
+                //     ->label('Menit Lebih Awal')
+                //     ->numeric()
+                //     ->sortable()
+                //     ->placeholder('-')
+                //     ->suffix(' mnt')
+                //     ->color('warning')
+                //     ->weight('medium')
+                //     ->toggleable(),
 
                 TextColumn::make('status')
                     ->label('Status')
@@ -307,7 +299,7 @@ class AttendanceResource extends Resource
                     ->native(false),
 
                 SelectFilter::make('teacher')
-                    ->label('Teacher')
+                    ->label('Pilih Guru')
                     ->relationship('teacher', 'name')
                     ->searchable()
                     ->preload()
@@ -358,6 +350,8 @@ class AttendanceResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make(),
+                    // ->withFilename(fn() => 'rekap-absensi-' . now()->format('Y-m-d-His')),
                     DeleteBulkAction::make(),
                 ]),
             ]);

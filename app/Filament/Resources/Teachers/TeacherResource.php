@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Teachers;
 
 use App\Filament\Resources\Teachers\Pages\ManageTeachers;
+use App\Filament\Resources\Teachers\RelationManagers\TeacherIdRelationManager;
 use App\Models\Teacher;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -139,6 +140,13 @@ class TeacherResource extends Resource
     {
         return [
             'index' => ManageTeachers::route('/'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            // TeacherIdRelationManager::class,
         ];
     }
 }
