@@ -36,14 +36,6 @@ class RfidAttendanceController extends Controller
         $attendance = Attendance::where('teacher_id', $teacher->id)
             ->whereDate('date', $today)
             ->first();
-        
-        // \Log::info('Attendance Check', [
-        //     'teacher_id' => $teacher->id,
-        //     'today' => $today,
-        //     'found' => $attendance ? 'yes' : 'no',
-        //     'check_in' => $attendance?->check_in,
-        //     'check_out' => $attendance?->check_out,
-        // ]);
 
         $now = Carbon::now();
 
@@ -59,27 +51,36 @@ class RfidAttendanceController extends Controller
 
             // Hitung keterlambatan berdasarkan start_time dari department
             $this->calculateLateStatus($attendance, $teacher, $now);
-            
+
             $attendance->save();
 
+            $message = "{$teacher->name} berhasil check-in pada {$now->format('H:i:s')}";
+
+            // Tambahkan info keterlambatan jika terlambat
+            if ($attendance->is_late && $attendance->late_minutes) {
+                $lateTime = $this->formatMinutesToTime($attendance->late_minutes);
+                $message .= " (Terlambat {$lateTime})";
+            }
+
             return redirect()->route('rfid.attendance.form')
-                ->with('success', "{$teacher->name} berhasil check-in pada {$now->format('H:i:s')}");
+                ->with('success', $message);
         }
 
         // Jika sudah ada check-in tapi belum check-out -> lakukan check-out
         if (!is_null($attendance->check_in) && is_null($attendance->check_out)) {
             $attendance->check_out = $now->toTimeString();
-            
+
             // Hitung apakah pulang lebih awal dari end_time department
             $this->calculateEarlyLeaveStatus($attendance, $teacher, $now);
-            
+
             $attendance->save();
 
             $message = "{$teacher->name} berhasil check-out pada {$now->format('H:i:s')}";
-            
+
             // Tambahkan peringatan jika pulang lebih awal
-            if ($attendance->is_early_leave) {
-                $message .= " (Pulang lebih awal {$attendance->early_leave_minutes} menit)";
+            if ($attendance->is_early_leave && $attendance->early_leave_minutes) {
+                $earlyTime = $this->formatMinutesToTime($attendance->early_leave_minutes);
+                $message .= " (Pulang lebih awal {$earlyTime})";
             }
 
             return redirect()->route('rfid.attendance.form')
@@ -137,11 +138,11 @@ class RfidAttendanceController extends Controller
         if ($endTime) {
             try {
                 $end = Carbon::parse($endTime)->setDate($now->year, $now->month, $now->day);
-                
+
                 // Jika check-out sebelum end_time
                 if ($now->lt($end)) {
                     $minutesEarly = $now->diffInMinutes($end);
-                    
+
                     $attendance->is_early_leave = true;
                     $attendance->early_leave_minutes = $minutesEarly;
                 } else {
@@ -156,5 +157,27 @@ class RfidAttendanceController extends Controller
             $attendance->is_early_leave = false;
             $attendance->early_leave_minutes = null;
         }
+    }
+
+    /**
+     * Format menit menjadi jam dan menit
+     * 
+     * @param int $minutes
+     * @return string
+     */
+    private function formatMinutesToTime(int $minutes): string
+    {
+        if ($minutes < 60) {
+            return "{$minutes} menit";
+        }
+
+        $hours = floor($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+
+        if ($remainingMinutes === 0) {
+            return "{$hours} jam";
+        }
+
+        return "{$hours} jam {$remainingMinutes} menit";
     }
 }

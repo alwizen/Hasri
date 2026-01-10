@@ -20,7 +20,7 @@
 
         <!-- Logo (Pojok Kiri Atas) -->
         <div class="fixed top-6 left-6 z-50">
-            <img src="{{ asset('/img/logo.png') }}" alt="Logo SMA NU Hasyim Asy'ari" class="h-20 w-auto drop-shadow-lg">
+            <img src="/img/logo.png" alt="Logo SMA NU Hasyim Asy'ari" class="h-20 w-auto drop-shadow-lg">
         </div>
 
         <!-- Toggle Mode (Pojok Kanan Atas) -->
@@ -38,6 +38,15 @@
                     </button>
                 </div>
             </div>
+        </div>
+
+        <!-- Debug Info (Pojok Kiri Bawah) - Hapus setelah testing -->
+        <div id="debugInfo"
+            class="fixed bottom-6 left-6 z-50 bg-black bg-opacity-70 text-white p-3 rounded-lg text-xs font-mono max-w-xs hidden">
+            <div>Mode: <span id="debugMode">-</span></div>
+            <div>Focus: <span id="debugFocus">-</span></div>
+            <div>Value: <span id="debugValue">-</span></div>
+            <div>Last Key: <span id="debugKey">-</span></div>
         </div>
 
         <!-- Notifikasi Toast -->
@@ -74,13 +83,9 @@
                         <label for="rfid_uid_manual" class="block text-sm font-medium text-gray-700 mb-2">
                             Tempelkan kartu RFID / Masukkan UID
                         </label>
-                        <input id="rfid_uid_manual" name="rfid_uid" type="text" value="{{ old('rfid_uid') }}"
-                            autofocus autocomplete="off"
+                        <input id="rfid_uid_manual" name="rfid_uid" type="text" autofocus autocomplete="off"
                             class="block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-lg"
                             placeholder="Contoh: 04A3B2C1">
-                        @error('rfid_uid')
-                            <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <div class="flex space-x-3">
@@ -104,9 +109,10 @@
         <!-- Konten Mode Otomatis (Fullscreen) -->
         <div id="autoMode" class="text-center px-8 hidden">
             <!-- Form Tersembunyi -->
-            <form id="rfidForm" action="{{ route('rfid.attendance.submit') }}" method="POST" class="hidden">
+            <form id="rfidForm" action="{{ route('rfid.attendance.submit') }}" method="POST">
                 @csrf
-                <input id="rfid_uid_auto" name="rfid_uid" type="text" autocomplete="off">
+                <input id="rfid_uid_auto" name="rfid_uid" type="text" autocomplete="off"
+                    style="position: absolute; left: -9999px;">
             </form>
 
             <!-- Icon RFID -->
@@ -116,7 +122,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
                 </svg>
-
             </div>
 
             <!-- Teks Utama -->
@@ -146,7 +151,27 @@
             const toast = document.getElementById('toast');
             const clearBtnManual = document.getElementById('clearBtnManual');
 
-            let currentMode = 'manual'; // default mode
+            // Debug elements
+            const debugInfo = document.getElementById('debugInfo');
+            const debugMode = document.getElementById('debugMode');
+            const debugFocus = document.getElementById('debugFocus');
+            const debugValue = document.getElementById('debugValue');
+            const debugKey = document.getElementById('debugKey');
+
+            let currentMode = 'manual';
+            let isProcessing = false;
+
+            // Show debug panel (hapus baris ini setelah testing)
+            debugInfo.classList.remove('hidden');
+
+            // Update debug info
+            function updateDebug() {
+                debugMode.textContent = currentMode;
+                debugFocus.textContent = document.activeElement.id || 'none';
+                debugValue.textContent = inputAuto.value || '(kosong)';
+            }
+
+            setInterval(updateDebug, 500);
 
             // Load saved mode dari localStorage
             const savedMode = localStorage.getItem('rfidMode');
@@ -172,6 +197,7 @@
                 autoBtn.classList.add('bg-indigo-800', 'bg-opacity-50', 'text-white');
 
                 setTimeout(() => inputManual.focus(), 100);
+                console.log('Switched to MANUAL mode');
             });
 
             // Switch ke Auto Mode
@@ -190,7 +216,10 @@
                 manualBtn.classList.remove('bg-white', 'text-indigo-600');
                 manualBtn.classList.add('bg-indigo-800', 'bg-opacity-50', 'text-white');
 
+                isProcessing = false;
+                inputAuto.value = '';
                 setTimeout(() => inputAuto.focus(), 100);
+                console.log('Switched to AUTO mode');
             }
 
             // === Manual Mode Logic ===
@@ -207,71 +236,129 @@
             });
 
             // === Auto Mode Logic ===
+
             // Pastikan input selalu fokus di mode auto
             document.addEventListener('click', () => {
-                if (currentMode === 'auto') inputAuto.focus();
+                if (currentMode === 'auto' && !isProcessing) {
+                    setTimeout(() => inputAuto.focus(), 50);
+                }
             });
 
             window.addEventListener('blur', () => {
-                if (currentMode === 'auto') {
+                if (currentMode === 'auto' && !isProcessing) {
                     setTimeout(() => inputAuto.focus(), 100);
                 }
             });
 
-            // Auto submit saat scanner selesai (biasanya dengan Enter)
+            // Re-focus berkala untuk mode auto
+            setInterval(() => {
+                if (currentMode === 'auto' && !isProcessing && document.activeElement !== inputAuto) {
+                    inputAuto.focus();
+                }
+            }, 500);
+
+            // Visual feedback saat mengetik di auto mode
+            inputAuto.addEventListener('input', function() {
+                console.log('INPUT EVENT - Value:', this.value, 'Length:', this.value.length);
+
+                if (this.value.length > 0 && statusIndicator) {
+                    statusIndicator.innerHTML = `
+                        <div class="w-4 h-4 bg-blue-400 rounded-full animate-pulse"></div>
+                        <p class="text-white text-xl font-medium">Membaca Kartu...</p>
+                    `;
+                }
+            });
+
+            // Deteksi semua key press untuk debugging
+            inputAuto.addEventListener('keydown', function(e) {
+                console.log('KEYDOWN -', 'Key:', e.key, 'Code:', e.code, 'Value:', this.value);
+                debugKey.textContent = e.key + ' (' + e.code + ')';
+            });
+
+            // Auto submit saat scanner selesai
             inputAuto.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+                console.log('KEYPRESS -', 'Key:', e.key, 'Value:', this.value, 'Processing:', isProcessing);
+
+                if (e.key === 'Enter' && !isProcessing) {
                     e.preventDefault();
+
+                    const rfidValue = this.value.trim();
+                    console.log('ENTER PRESSED - RFID Value:', rfidValue);
+
+                    // Validasi input tidak kosong
+                    if (!rfidValue) {
+                        console.error('Input kosong, tidak submit');
+
+                        if (statusIndicator) {
+                            statusIndicator.innerHTML = `
+                                <div class="w-4 h-4 bg-red-400 rounded-full"></div>
+                                <p class="text-white text-xl font-medium">Error - Coba Lagi</p>
+                            `;
+                        }
+
+                        setTimeout(() => {
+                            isProcessing = false;
+                            inputAuto.value = '';
+                            inputAuto.focus();
+                            if (statusIndicator) {
+                                statusIndicator.innerHTML = `
+                                    <div class="w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+                                    <p class="text-white text-xl font-medium">Siap Menerima</p>
+                                `;
+                            }
+                        }, 1500);
+                        return;
+                    }
+
+                    isProcessing = true;
 
                     // Animasi saat memproses
                     if (statusIndicator) {
                         statusIndicator.innerHTML = `
-                        <div class="w-4 h-4 bg-yellow-400 rounded-full animate-spin border-2 border-white border-t-transparent"></div>
-                        <p class="text-white text-xl font-medium">Memproses...</p>
-                    `;
+                            <div class="w-4 h-4 bg-yellow-400 rounded-full animate-spin border-2 border-white border-t-transparent"></div>
+                            <p class="text-white text-xl font-medium">Memproses...</p>
+                        `;
                     }
 
-                    // Submit form
+                    console.log('Submitting form with RFID:', rfidValue);
+
+                    // Submit form ke Laravel
                     form.submit();
                 }
             });
 
-            // Visual feedback saat mengetik di auto mode
-            inputAuto.addEventListener('input', function() {
-                if (this.value.length > 0 && statusIndicator) {
-                    statusIndicator.innerHTML = `
-                    <div class="w-4 h-4 bg-blue-400 rounded-full animate-pulse"></div>
-                    <p class="text-white text-xl font-medium">Membaca Kartu...</p>
-                `;
-                }
-            });
-
-            // Auto hide toast setelah 3 detik
+            // Auto hide toast setelah 3 detik (untuk session flash messages)
             if (toast) {
                 setTimeout(() => {
                     toast.style.transition = 'opacity 0.5s';
                     toast.style.opacity = '0';
                     setTimeout(() => toast.remove(), 500);
                 }, 3000);
-            }
 
-            // Auto clear dan re-focus setelah toast hilang
-            if (toast) {
+                // Auto clear dan re-focus setelah toast
                 setTimeout(() => {
                     if (currentMode === 'auto') {
                         inputAuto.value = '';
+                        isProcessing = false;
                         inputAuto.focus();
                         if (statusIndicator) {
                             statusIndicator.innerHTML = `
-                            <div class="w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
-                            <p class="text-white text-xl font-medium">Siap Menerima</p>
-                        `;
+                                <div class="w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+                                <p class="text-white text-xl font-medium">Siap Menerima</p>
+                            `;
                         }
                     } else {
                         inputManual.value = '';
                         inputManual.focus();
                     }
                 }, 3500);
+            }
+
+            // Initial focus
+            if (currentMode === 'auto') {
+                setTimeout(() => inputAuto.focus(), 100);
+            } else {
+                setTimeout(() => inputManual.focus(), 100);
             }
         </script>
     </div>

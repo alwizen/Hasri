@@ -38,13 +38,19 @@ class TeacherResource extends Resource
             ->components([
                 TextInput::make('nip')
                     ->label('NIP')
-                    ->numeric(),
+                    ->unique(ignoreRecord: true)
+                    ->required()
+                    ->maxLength(255),
                 TextInput::make('name')
                     ->required()
                     ->label('Nama Lengkap'),
                 TextInput::make('rfid_uid')
                     ->label('RFID (Kartu Absen)')
-                    ->numeric(),
+                    ->label('RFID')
+                    ->helperText('Kartu ID Untuk Absesi Guru')
+                    ->unique(ignoreRecord: true)
+                    ->required()
+                    ->maxLength(255),
                 Select::make('departement_id')
                     ->relationship('departement', 'name')
                     ->required()
