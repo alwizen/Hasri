@@ -101,6 +101,33 @@ class RfidAttendanceController extends Controller
     /**
      * Hitung status keterlambatan saat check-in
      */
+    // private function calculateLateStatus(Attendance $attendance, Teacher $teacher, Carbon $now)
+    // {
+    //     $startTime = $teacher->departement->start_time ?? null;
+    //     $tolerance = (int) ($teacher->departement->tolerance_late_minutes ?? 0);
+
+    //     if ($startTime) {
+    //         try {
+    //             $start = Carbon::parse($startTime)->setDate($now->year, $now->month, $now->day);
+    //             $diffMinutes = $now->diffInMinutes($start, false);
+
+    //             // diffInMinutes dengan false returns negatif jika $now < $start
+    //             $minutesLateFromStart = $diffMinutes > 0 ? $diffMinutes : 0;
+    //             $minutesLateBeyondTolerance = max(0, $minutesLateFromStart - $tolerance);
+    //             $isLate = $minutesLateFromStart > $tolerance;
+
+    //             $attendance->is_late = $isLate;
+    //             $attendance->late_minutes = $minutesLateBeyondTolerance > 0 ? $minutesLateBeyondTolerance : null;
+    //         } catch (\Exception $e) {
+    //             $attendance->is_late = false;
+    //             $attendance->late_minutes = null;
+    //         }
+    //     } else {
+    //         $attendance->is_late = false;
+    //         $attendance->late_minutes = null;
+    //     }
+    // }
+
     private function calculateLateStatus(Attendance $attendance, Teacher $teacher, Carbon $now)
     {
         $startTime = $teacher->departement->start_time ?? null;
@@ -109,15 +136,25 @@ class RfidAttendanceController extends Controller
         if ($startTime) {
             try {
                 $start = Carbon::parse($startTime)->setDate($now->year, $now->month, $now->day);
-                $diffMinutes = $now->diffInMinutes($start, false);
 
-                // diffInMinutes dengan false returns negatif jika $now < $start
-                $minutesLateFromStart = $diffMinutes > 0 ? $diffMinutes : 0;
-                $minutesLateBeyondTolerance = max(0, $minutesLateFromStart - $tolerance);
-                $isLate = $minutesLateFromStart > $tolerance;
+                // Jika check-in SETELAH start_time
+                if ($now->gt($start)) {
+                    $minutesLate = $start->diffInMinutes($now);
 
-                $attendance->is_late = $isLate;
-                $attendance->late_minutes = $minutesLateBeyondTolerance > 0 ? $minutesLateBeyondTolerance : null;
+                    // Cek apakah melebihi toleransi
+                    if ($minutesLate > $tolerance) {
+                        $attendance->is_late = true;
+                        $attendance->late_minutes = (int) round($minutesLate - $tolerance);
+                    } else {
+                        // Terlambat tapi masih dalam toleransi
+                        $attendance->is_late = false;
+                        $attendance->late_minutes = null;
+                    }
+                } else {
+                    // Check-in tepat waktu atau lebih awal
+                    $attendance->is_late = false;
+                    $attendance->late_minutes = null;
+                }
             } catch (\Exception $e) {
                 $attendance->is_late = false;
                 $attendance->late_minutes = null;

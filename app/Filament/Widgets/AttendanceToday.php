@@ -13,6 +13,8 @@ class AttendanceToday extends StatsOverviewWidget
 
     protected ?string $pollingInterval = '10s';
 
+    protected static bool $isLazy = false;
+
     protected function getStats(): array
     {
         $today = Carbon::today();

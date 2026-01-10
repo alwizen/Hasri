@@ -22,6 +22,7 @@ class AttendanceTodayTable extends TableWidget
     {
         return $table
             ->poll('10s')
+            ->deferLoading()
             ->query(function (): Builder {
                 return Attendance::query()
                     ->whereDate('date', Carbon::today());
@@ -31,6 +32,17 @@ class AttendanceTodayTable extends TableWidget
                 TextColumn::make('teacher.name')
                     ->label('Nama Lengkap')
                     ->weight('medium'),
+
+                TextColumn::make('teacher.departement.name')
+                    ->label('Departemen')
+                    ->badge()
+                    ->color('info'),
+
+                TextColumn::make('teacher.departement.start_time')
+                    ->label('Jadwal Masuk')
+                    ->time('H:i')
+                    ->iconColor('primary')
+                    ->suffix(' Wib'),
 
                 TextColumn::make('date')
                     ->label('Tanggal')
@@ -46,21 +58,26 @@ class AttendanceTodayTable extends TableWidget
                 TextColumn::make('check_out')
                     ->label('Jam Pulang')
                     ->time('H:i:s')
-                    ->sortable()
+
                     ->placeholder('-')
                     ->icon('heroicon-o-arrow-left-on-rectangle')
                     ->iconColor('danger'),
 
-                IconColumn::make('is_late')
-                    ->label('Telat')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-x-circle')
-                    ->falseIcon('heroicon-o-check-circle')
-                    ->trueColor('danger')
-                    ->falseColor('success'),
+                TextColumn::make('is_late')
+                    ->label('Keterlambatan')
+                    ->formatStateUsing(function ($record): string {
+                        if ($record->is_late && $record->late_minutes) {
+                            return "Terlambat ({$record->late_minutes} menit)";
+                        }
+                        return $record->is_late ? 'Terlambat' : 'Tidak Terlambat';
+                    })
+                    ->badge()
+                    ->color(fn($record): string => $record->is_late ? 'danger' : 'success'),
 
                 TextColumn::make('status')
                     ->label('Status')
+
+
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'masuk' => 'success',
@@ -69,11 +86,6 @@ class AttendanceTodayTable extends TableWidget
                         default => 'gray',
                     }),
 
-                // TextColumn::make('permission_note')
-                //     ->label('Keterangan Izin')
-                //     ->limit(30)
-                //     // ->toggleable(isToggledHiddenByDefault: true)
-                //     ->tooltip(fn($state) => $state),
             ])
             ->filters([
                 //

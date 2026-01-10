@@ -193,46 +193,66 @@ class AttendanceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn($query) => $query->with(['teacher.departement']))
             ->columns([
                 TextColumn::make('teacher.name')
                     ->label('Nama Lengkap')
                     ->searchable()
-                    ->sortable()
+
                     ->weight('medium'),
+
+                TextColumn::make('teacher.departement.name')
+                    ->label('Departemen')
+                    ->badge()
+                    ->color('info')
+                    ->searchable(),
+
+                TextColumn::make('teacher.rfid_uid')
+                    ->label('RFID UID')
+                    ->searchable()
+                    ->copyable(),
+
+                TextColumn::make('teacher.departement.start_time')
+                    ->label('Jam Masuk (Jadwal)')
+                    ->time('H:i')
+                    // ->icon('heroicon-o-clock')
+                    ->iconColor('primary')
+                    ->suffix(' Wib'),
 
                 TextColumn::make('date')
                     ->label('Tanggal')
-                    ->date('d M Y')
-                    ->sortable(),
+                    ->date('d M Y'),
 
                 TextColumn::make('check_in')
                     ->label('Jam Masuk')
                     ->time('H:i:s')
-                    ->sortable()
                     ->placeholder('-')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->iconColor('success'),
 
-                IconColumn::make('is_late')
-                    ->label('Telat')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-x-circle')
-                    ->falseIcon('heroicon-o-check-circle')
-                    ->trueColor('danger')
-                    ->falseColor('success'),
-
                 TextColumn::make('check_out')
                     ->label('Jam Pulang')
                     ->time('H:i:s')
-                    ->sortable()
+
                     ->placeholder('-')
                     ->icon('heroicon-o-arrow-left-on-rectangle')
                     ->iconColor('danger'),
 
+                TextColumn::make('is_late')
+                    ->label('Keterlambatan')
+                    ->formatStateUsing(function ($record): string {
+                        if ($record->is_late && $record->late_minutes) {
+                            return "Terlambat ({$record->late_minutes} menit)";
+                        }
+                        return $record->is_late ? 'Terlambat' : 'Tidak Terlambat';
+                    })
+                    ->badge()
+                    ->color(fn($record): string => $record->is_late ? 'danger' : 'success'),
+
                 // TextColumn::make('late_minutes')
                 //     ->label('Menit Telat')
                 //     ->numeric()
-                //     ->sortable()
+                //     
                 //     ->placeholder('-')
                 //     ->suffix(' mnt')
                 //     ->color('danger')
@@ -250,7 +270,7 @@ class AttendanceResource extends Resource
                 // TextColumn::make('early_leave_minutes')
                 //     ->label('Menit Lebih Awal')
                 //     ->numeric()
-                //     ->sortable()
+                //     
                 //     ->placeholder('-')
                 //     ->suffix(' mnt')
                 //     ->color('warning')
@@ -260,7 +280,7 @@ class AttendanceResource extends Resource
                 TextColumn::make('status')
                     ->label('Status')
                     ->searchable()
-                    ->sortable()
+
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'masuk' => 'success',
@@ -278,13 +298,13 @@ class AttendanceResource extends Resource
                 TextColumn::make('created_at')
                     ->label('Dibuat pada')
                     ->dateTime('d M Y H:i')
-                    ->sortable()
+
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
                     ->label('Diubah pada')
                     ->dateTime('d M Y H:i')
-                    ->sortable()
+
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('date', 'desc')
