@@ -22,6 +22,7 @@ class AttendanceTodayTable extends TableWidget
     {
         return $table
             ->poll('10s')
+            ->defaultSort('updated_at', 'desc')
             ->deferLoading()
             ->query(function (): Builder {
                 return Attendance::query()
@@ -69,7 +70,7 @@ class AttendanceTodayTable extends TableWidget
                         if ($record->is_late && $record->late_minutes) {
                             return "Terlambat ({$record->late_minutes} menit)";
                         }
-                        return $record->is_late ? 'Terlambat' : 'Tidak Terlambat';
+                        return $record->is_late ? 'Terlambat' : 'Tepat Waktu';
                     })
                     ->badge()
                     ->color(fn($record): string => $record->is_late ? 'danger' : 'success'),

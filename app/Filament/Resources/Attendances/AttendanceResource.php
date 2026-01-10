@@ -244,7 +244,7 @@ class AttendanceResource extends Resource
                         if ($record->is_late && $record->late_minutes) {
                             return "Terlambat ({$record->late_minutes} menit)";
                         }
-                        return $record->is_late ? 'Terlambat' : 'Tidak Terlambat';
+                        return $record->is_late ? 'Terlambat' : 'Tepat Waktu';
                     })
                     ->badge()
                     ->color(fn($record): string => $record->is_late ? 'danger' : 'success'),
@@ -322,6 +322,7 @@ class AttendanceResource extends Resource
                     ->label('Pilih Guru')
                     ->relationship('teacher', 'name')
                     ->searchable()
+                    ->multiple()
                     ->preload()
                     ->native(false),
 
