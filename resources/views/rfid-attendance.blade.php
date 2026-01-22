@@ -52,21 +52,39 @@
         <!-- Notifikasi Toast -->
         @if (session('success'))
             <div id="toast"
-                class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg bg-green-500 text-white font-semibold shadow-lg animate-bounce">
+                class="fixed top-10 left-1/2 transform -translate-x-1/2 z-50 
+               px-10 py-6 rounded-xl 
+               bg-green-600 text-white 
+               text-3xl font-bold 
+               shadow-2xl
+               max-w-3xl text-center
+               transition-opacity duration-500">
                 {{ session('success') }}
             </div>
         @endif
 
         @if (session('error'))
             <div id="toast"
-                class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg bg-red-500 text-white font-semibold shadow-lg animate-bounce">
+                class="fixed top-10 left-1/2 transform -translate-x-1/2 z-50 
+               px-10 py-6 rounded-xl 
+               bg-red-600 text-white 
+               text-3xl font-bold 
+               shadow-2xl
+               max-w-3xl text-center
+               transition-opacity duration-500">
                 {{ session('error') }}
             </div>
         @endif
 
         @if (session('warning'))
             <div id="toast"
-                class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg bg-yellow-500 text-white font-semibold shadow-lg animate-bounce">
+                class="fixed top-10 left-1/2 transform -translate-x-1/2 z-50 
+               px-10 py-6 rounded-xl 
+               bg-yellow-400 text-black 
+               text-3xl font-bold 
+               shadow-2xl
+               max-w-3xl text-center
+               transition-opacity duration-500">
                 {{ session('warning') }}
             </div>
         @endif

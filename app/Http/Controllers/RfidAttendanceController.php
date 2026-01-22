@@ -27,7 +27,7 @@ class RfidAttendanceController extends Controller
 
         if (! $teacher) {
             return redirect()->route('rfid.attendance.form')
-                ->with('error', "Teacher dengan RFID UID \"{$rfid}\" tidak ditemukan.");
+                ->with('error', "Guru dengan Kartu Absen \"{$rfid}\" tidak ditemukan.");
         }
 
         $today = Carbon::now()->toDateString();
@@ -54,7 +54,7 @@ class RfidAttendanceController extends Controller
 
             $attendance->save();
 
-            $message = "{$teacher->name} berhasil check-in pada {$now->format('H:i:s')}";
+            $message = "{$teacher->name} berhasil Absensi Masuk pada {$now->format('H:i:s')}";
 
             // Tambahkan info keterlambatan jika terlambat
             if ($attendance->is_late && $attendance->late_minutes) {
@@ -75,7 +75,7 @@ class RfidAttendanceController extends Controller
 
             $attendance->save();
 
-            $message = "{$teacher->name} berhasil check-out pada {$now->format('H:i:s')}";
+            $message = "{$teacher->name} berhasil Absensi Pulang pada {$now->format('H:i:s')}";
 
             // Tambahkan peringatan jika pulang lebih awal
             if ($attendance->is_early_leave && $attendance->early_leave_minutes) {
