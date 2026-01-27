@@ -108,12 +108,14 @@ class TeacherResource extends Resource
                     ->alignCenter(),
                 TextColumn::make('nip')
                     ->searchable()
+                    ->copyable()
                     ->label('NIP'),
                 TextColumn::make('name')
                     ->searchable()
                     ->label('Nama Lengkap'),
                 TextColumn::make('rfid_uid')
                     ->searchable()
+                    ->copyable()
                     ->label('Kartu Absen'),
                 TextColumn::make('departement.name')
                     ->badge()
