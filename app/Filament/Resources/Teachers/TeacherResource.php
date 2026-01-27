@@ -21,6 +21,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class TeacherResource extends Resource
 {
@@ -30,8 +31,14 @@ class TeacherResource extends Resource
 
     protected static ?string $navigationLabel = 'Daftar Guru';
 
+    protected static string | UnitEnum | null $navigationGroup = 'Master Data';
+
     protected static ?string $label = "Daftar Guru";
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
     public static function form(Schema $schema): Schema
     {
         return $schema

@@ -1,39 +1,39 @@
 <?php
 
-namespace App\Filament\Resources\Departements;
+namespace App\Filament\Resources\ClassRooms;
 
-use App\Filament\Resources\Departements\Pages\ManageDepartements;
-use App\Models\Departement;
+use App\Filament\Resources\ClassRooms\Pages\ManageClassRooms;
+use App\Models\ClassRoom;
 use BackedEnum;
+use DateTime;
+use Dom\Text;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use UnitEnum;
 
-class DepartementResource extends Resource
+class ClassRoomResource extends Resource
 {
-    protected static ?string $model = Departement::class;
+    protected static ?string $model = ClassRoom::class;
 
-    protected static ?string $navigationLabel = 'Jabatan';
+    protected static ?string $navigationLabel = 'Data Kelas';
 
-    protected static ?string $label = 'Jabatan';
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
+    protected static ?string $label = 'Kelas';
 
     protected static string | UnitEnum | null $navigationGroup = 'Lainnya';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperClip;
 
     public static function form(Schema $schema): Schema
     {
@@ -41,12 +41,29 @@ class DepartementResource extends Resource
             ->components([
                 TextInput::make('name')
                     ->required(),
-                TimePicker::make('start_time')
-                    ->native(false),
-                TimePicker::make('end_time')
-                    ->native(false),
-                TextInput::make('tolerance_late_minutes')
-                    ->numeric(),
+                DateTimePicker::make('start_time')
+                    ->required(),
+                DateTimePicker::make('end_time')
+            ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextEntry::make('name'),
+                TextEntry::make('start_time')
+                    ->dateTime()
+                    ->placeholder('-'),
+                TextEntry::make('end_time')
+                    ->dateTime()
+                    ->placeholder('-'),
+                TextEntry::make('created_at')
+                    ->dateTime()
+                    ->placeholder('-'),
+                TextEntry::make('updated_at')
+                    ->dateTime()
+                    ->placeholder('-'),
             ]);
     }
 
@@ -56,22 +73,13 @@ class DepartementResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
-                    ->label('Nama Jabatan'),
+                    ->label('Nama Kelas'),
                 TextColumn::make('start_time')
                     ->time('H:i')
-                    ->label('Jam Berangkat')
-                    ->suffix(' Wib')
-                    ->sortable(),
+                    ->label('Waktu Masuk'),
                 TextColumn::make('end_time')
                     ->time('H:i')
-                    ->suffix(' Wib')
-                    ->label('Jam Pulang')
-                    ->sortable(),
-                TextColumn::make('tolerance_late_minutes')
-                    ->numeric()
-                    ->label('Toeransi Keterlambatan')
-                    ->suffix(' Menit')
-                    ->sortable(),
+                    ->label('Waktu Keluar'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -85,6 +93,7 @@ class DepartementResource extends Resource
                 //
             ])
             ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -98,7 +107,7 @@ class DepartementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ManageDepartements::route('/'),
+            'index' => ManageClassRooms::route('/'),
         ];
     }
 }

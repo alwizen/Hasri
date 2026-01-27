@@ -16,6 +16,8 @@ class AttendanceTodayTable extends TableWidget
 {
     protected int | string | array $columnSpan = 'full';
 
+    protected static ?int $sort = 1;
+
     protected static ?string $heading = 'Daftar Kehadiran Guru Hari Ini';
 
     public function table(Table $table): Table

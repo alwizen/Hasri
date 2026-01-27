@@ -18,13 +18,13 @@ return new class extends Migration
             $table->foreignId('teacher_id')->constrained()->onDelete('cascade');
 
             // Absen
-            $table->date('date');                     
-            $table->time('check_in')->nullable();     
-            $table->time('check_out')->nullable();   
+            $table->date('date');
+            $table->time('check_in')->nullable();
+            $table->time('check_out')->nullable();
 
             // Keterangan
             $table->boolean('is_late')->default(false);
-            $table->integer('late_minutes')->nullable(); 
+            $table->integer('late_minutes')->nullable();
 
             $table->timestamps();
         });

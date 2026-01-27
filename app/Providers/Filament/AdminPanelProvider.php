@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\AttendanceStudentTable;
 use App\Filament\Widgets\AttendanceToday;
 use App\Filament\Widgets\AttendanceTodayTable;
 use App\Filament\Widgets\MyWidget;
@@ -49,7 +50,8 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AttendanceToday::class,
-                AttendanceTodayTable::class
+                AttendanceTodayTable::class,
+                AttendanceStudentTable::class
                 // AccountWidget::class,
                 // FilamentInfoWidget::class,
             ])

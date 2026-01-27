@@ -29,6 +29,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use UnitEnum;
 
 class AttendanceResource extends Resource
 {
@@ -37,6 +38,8 @@ class AttendanceResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocument;
 
     protected static ?string $navigationLabel = 'Rekap Absensi';
+
+    protected static string | UnitEnum | null $navigationGroup = 'Rekapitulasi';
 
     protected static ?string $modelLabel = 'Absensi';
 
@@ -102,14 +105,6 @@ class AttendanceResource extends Resource
                     ->label('Pulang Lebih Awal?')
                     ->default(false)
                     ->inline(false),
-
-                // TextInput::make('early_leave_minutes')
-                //     ->label('Menit Lebih Awal')
-                //     ->numeric()
-                //     ->suffix('menit')
-                //     ->nullable()
-                //     ->helperText('Diisi otomatis oleh sistem saat check-out.')
-                //     ->disabled(),
 
                 TextInput::make('permission_note')
                     ->label('Keterangan Izin')
