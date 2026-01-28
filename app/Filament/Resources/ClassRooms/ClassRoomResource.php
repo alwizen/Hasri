@@ -20,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use UnitEnum;
 
@@ -67,6 +68,12 @@ class ClassRoomResource extends Resource
             ]);
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withCount('students');
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -80,6 +87,13 @@ class ClassRoomResource extends Resource
                 TextColumn::make('end_time')
                     ->time('H:i')
                     ->label('Waktu Keluar'),
+                TextColumn::make('tolerance_late_minutes')
+                    ->label('Toleransi Terlambat (menit)')
+                    ->suffix(' Menit'),
+                TextColumn::make('students_count')
+                    ->label('Jumlah Siswa')
+                    ->suffix(' Siswa'),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

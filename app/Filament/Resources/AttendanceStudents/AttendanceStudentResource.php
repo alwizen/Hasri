@@ -19,10 +19,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables\Filters\Filter;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
 use UnitEnum;
 
@@ -90,8 +92,12 @@ class AttendanceStudentResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('student.nis')
+                    ->label('Kartu Absen')
+                    ->copyable()
+                    ->searchable(),
                 TextColumn::make('student.full_name')
-                    ->label('Student Name')
+                    ->label('Nama Siswa')
                     ->searchable(),
                 TextColumn::make('attendance_date')
                     ->date()
@@ -121,15 +127,13 @@ class AttendanceStudentResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('class_room_id')
-                    ->label('Kelas')
-                    ->relationship('student.classRoom', 'name'),
                 SelectFilter::make('student_id')
                     ->label('Siswa')
                     ->preload()
                     ->multiple()
                     ->searchable()
                     ->relationship('student', 'full_name'),
+
                 SelectFilter::make('status')
                     ->options([
                         'masuk' => 'Masuk',
@@ -137,6 +141,28 @@ class AttendanceStudentResource extends Resource
                         'absen' => 'Absen',
                         'terlambat' => 'Terlambat',
                     ]),
+
+                // 🔥 FILTER RANGE TANGGAL
+                Filter::make('attendance_date')
+                    ->form([
+                        DatePicker::make('from')
+                            ->label('Dari Tanggal'),
+                        DatePicker::make('until')
+                            ->label('Sampai Tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn(Builder $query, $date) =>
+                                $query->whereDate('attendance_date', '>=', $date)
+                            )
+                            ->when(
+                                $data['until'],
+                                fn(Builder $query, $date) =>
+                                $query->whereDate('attendance_date', '<=', $date)
+                            );
+                    }),
             ])
             ->recordActions([
                 ViewAction::make(),

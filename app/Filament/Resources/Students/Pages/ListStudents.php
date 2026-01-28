@@ -5,13 +5,15 @@ namespace App\Filament\Resources\Students\Pages;
 use App\Filament\Resources\Students\StudentResource;
 use App\Models\ClassRoom;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Enums\IconPosition;
 use Illuminate\Database\Eloquent\Builder;
 
-class ManageStudents extends ManageRecords
+class ListStudents extends ListRecords
 {
+    protected static string $resource = StudentResource::class;
+
     public function getTabs(): array
     {
         $tabs = [
@@ -34,9 +36,6 @@ class ManageStudents extends ManageRecords
 
         return $tabs;
     }
-
-
-    protected static string $resource = StudentResource::class;
 
     protected function getHeaderActions(): array
     {
