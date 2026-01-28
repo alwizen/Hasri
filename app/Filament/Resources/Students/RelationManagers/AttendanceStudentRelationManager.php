@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Students\RelationManagers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Dom\Text;
 use Filament\Actions\AssociateAction;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -89,6 +91,27 @@ class AttendanceStudentRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('printPdf')
+                        ->label('Cetak PDF')
+                        ->icon('heroicon-o-printer')
+                        ->color('primary')
+                        ->action(function ($records) {
+                            $student = $this->getOwnerRecord();
+
+                            $records = $records->sortBy('attendance_date');
+
+                            $pdf = Pdf::loadView('pdf.attendance-student', [
+                                'student' => $student,
+                                'records' => $records,
+                            ]);
+
+                            return response()->streamDownload(
+                                fn() => print($pdf->output()),
+                                'absensi-' . str($student->full_name)->slug('_') . '.pdf'
+                            );
+                        }),
+
+                    // Excel tetap ada
                     ExportBulkAction::make()
                         ->exports([
                             ExcelExport::make()
@@ -98,19 +121,16 @@ class AttendanceStudentRelationManager extends RelationManager
                                             fn($record) =>
                                             optional($record->attendance_date)?->format('Y-m-d')
                                         ),
-
                                     Column::make('Masuk')
                                         ->getStateUsing(
                                             fn($record) =>
                                             optional($record->check_in_at)?->format('H:i')
                                         ),
-
                                     Column::make('Pulang')
                                         ->getStateUsing(
                                             fn($record) =>
                                             optional($record->check_out_at)?->format('H:i')
                                         ),
-
                                     Column::make('Status')
                                         ->getStateUsing(
                                             fn($record) =>

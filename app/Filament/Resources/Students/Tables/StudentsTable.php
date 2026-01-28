@@ -57,8 +57,6 @@ class StudentsTable
                     ->label('Riwayat Kehadiran')
                     ->slideOver()
                     ->icon('heroicon-m-plus')
-                    // ->modalWidth('5xl')
-                    // ->compact()
                     ->relationManager(AttendanceStudentRelationManager::make()),
                 ViewAction::make(),
                 EditAction::make(),
