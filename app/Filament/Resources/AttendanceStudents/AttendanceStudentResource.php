@@ -34,6 +34,8 @@ class AttendanceStudentResource extends Resource
 
     protected static ?string $navigationLabel = 'Rekap Absensi Siswa';
 
+    protected static ?int $navigationSort = 0;
+
     protected static string | UnitEnum | null $navigationGroup = 'Rekapitulasi';
 
     protected static ?string $modelLabel = 'Absensi Siswa';
@@ -141,8 +143,6 @@ class AttendanceStudentResource extends Resource
                         'absen' => 'Absen',
                         'terlambat' => 'Terlambat',
                     ]),
-
-                // 🔥 FILTER RANGE TANGGAL
                 Filter::make('attendance_date')
                     ->form([
                         DatePicker::make('from')

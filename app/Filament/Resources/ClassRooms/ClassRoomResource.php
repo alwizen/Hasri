@@ -30,6 +30,8 @@ class ClassRoomResource extends Resource
 
     protected static ?string $navigationLabel = 'Data Kelas';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $label = 'Kelas';
 
     protected static string | UnitEnum | null $navigationGroup = 'Lainnya';

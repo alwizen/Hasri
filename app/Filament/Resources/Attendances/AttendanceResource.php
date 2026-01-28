@@ -39,6 +39,8 @@ class AttendanceResource extends Resource
 
     protected static ?string $navigationLabel = 'Rekap Absensi';
 
+    protected static ?int $navigationSort = 0;
+
     protected static string | UnitEnum | null $navigationGroup = 'Rekapitulasi';
 
     protected static ?string $modelLabel = 'Absensi';

@@ -25,7 +25,6 @@ class AttendanceTodayTable extends TableWidget
         return $table
             ->poll('10s')
             ->defaultSort('updated_at', 'desc')
-            ->deferLoading()
             ->query(function (): Builder {
                 return Attendance::query()
                     ->whereDate('date', Carbon::today());

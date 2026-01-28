@@ -33,6 +33,8 @@ class TeacherResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup = 'Master Data';
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $label = "Daftar Guru";
 
     public static function getNavigationBadge(): ?string

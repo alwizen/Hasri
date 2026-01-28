@@ -24,6 +24,8 @@ class DepartementResource extends Resource
 
     protected static ?string $navigationLabel = 'Jabatan';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $label = 'Jabatan';
 
     public static function getNavigationBadge(): ?string

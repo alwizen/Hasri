@@ -35,8 +35,6 @@ class AttendanceStudentRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('attendance_date')
             ->columns([
-                // TextColumn::make('student.full_name')
-                //     ->label('Nama Siswa'),
                 TextColumn::make('attendance_date')
                     ->date()
                     ->label('Tanggal'),

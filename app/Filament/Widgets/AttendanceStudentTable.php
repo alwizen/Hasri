@@ -6,6 +6,7 @@ use App\Models\AttendanceStudent;
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,6 +23,8 @@ class AttendanceStudentTable extends TableWidget
     public function table(Table $table): Table
     {
         return $table
+            ->poll('10s')
+            ->defaultSort('updated_at', 'desc')
             ->query(function (): Builder {
                 return AttendanceStudent::query()
                     ->whereDate('attendance_date', Carbon::today());
@@ -41,20 +44,35 @@ class AttendanceStudentTable extends TableWidget
                 TextColumn::make('check_out_at')
                     ->dateTime()
                     ->label('Jam Pulang'),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'masuk' => 'success',
+                        'izin'  => 'warning',
+                        'absen' => 'danger',
+                        'terlambat' => 'warning',
+                        default => 'secondary',
+                    }),
             ])
             ->filters([
-                //
-            ])
-            ->headerActions([
-                //
-            ])
-            ->recordActions([
-                //
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    //
-                ]),
+                SelectFilter::make('student.class_room_id')
+                    ->label('Kelas')
+                    ->relationship('student.classRoom', 'name'),
+                // SelectFilter::make('student_id')
+                //     ->label('Siswa')
+                //     ->preload()
+                //     ->multiple()
+                //     ->searchable()
+                //     ->relationship('student', 'full_name'),
+
+                // SelectFilter::make('status')
+                //     ->options([
+                //         'masuk' => 'Masuk',
+                //         'izin'  => 'Izin',
+                //         'absen' => 'Absen',
+                //         'terlambat' => 'Terlambat',
+                //     ]),
+
             ]);
     }
 }
