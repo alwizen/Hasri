@@ -12,7 +12,7 @@ class AttendanceToday extends StatsOverviewWidget
 {
     protected ?string $heading = 'Absensi Guru Hari Ini';
 
-    protected ?string $description = 'Menampilkan jumlah guru yang hadir hari ini';
+    // protected ?string $description = 'Menampilkan jumlah guru yang hadir hari ini';
 
     protected ?string $pollingInterval = '10s';
 

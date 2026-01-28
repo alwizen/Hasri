@@ -11,7 +11,7 @@ class AttendancePerClass extends StatsOverviewWidget
 {
     protected ?string $heading = 'Absensi Per Kelas';
 
-    protected ?string $description = 'Menampilkan jumlah siswa yang hadir hari ini per kelas';
+    // protected ?string $description = 'Menampilkan jumlah siswa yang hadir hari ini per kelas';
 
     protected ?string $pollingInterval = '10s';
 
@@ -28,8 +28,6 @@ class AttendancePerClass extends StatsOverviewWidget
 
         foreach ($classes as $class) {
             $presentCount = AttendanceStudent::whereDate('attendance_date', $today)
-                // ->where('status', AttendanceStudent::STATUS_MASUK)
-                // ->where('attendance_date', today())
                 ->whereHas('student', function ($query) use ($class) {
                     $query->where('class_room_id', $class->id);
                 })
@@ -40,9 +38,9 @@ class AttendancePerClass extends StatsOverviewWidget
 
             $stats[] = Stat::make(
                 $class->name,
-                "{$presentCount} / {$totalStudents}"
+                "{$presentCount} / {$totalStudents} Siswa"
             )
-                ->description('Hadir hari ini')
+                ->description('Masuk hari ini')
                 ->color(
                     $presentCount === $totalStudents ? 'success' : 'warning'
                 );
