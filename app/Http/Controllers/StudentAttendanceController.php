@@ -25,7 +25,7 @@ class StudentAttendanceController extends Controller
             ->first();
 
         if (! $student) {
-            return back()->with('error', 'NIS tidak ditemukan.');
+            return back()->with('error', 'Nomor Absensi tidak ditemukan.');
         }
 
         $today = Carbon::today();
@@ -62,9 +62,13 @@ class StudentAttendanceController extends Controller
                 'status' => $status,
             ]);
 
+            $kelas = $student->classRoom
+                ? $student->classRoom->name
+                : 'Tanpa Kelas';
+
             return back()->with(
                 'success',
-                "Check-in berhasil: {$student->full_name} (Status: {$status})"
+                "Berhasil: {$student->full_name} - Kelas {$kelas} ({$status})"
             );
         }
 
@@ -76,18 +80,25 @@ class StudentAttendanceController extends Controller
                 'check_out_at' => $now,
             ]);
 
+            $kelas = $student->classRoom
+                ? $student->classRoom->name
+                : 'Tanpa Kelas';
+
             return back()->with(
                 'success',
-                "Check-out berhasil: {$student->full_name}"
+                "Check-out berhasil: {$student->full_name} - Kelas {$kelas}"
             );
         }
 
         // =========================
         // SUDAH LENGKAP
         // =========================
+        $kelas = $student->classRoom
+            ? $student->classRoom->name
+            : 'Tanpa Kelas';
         return back()->with(
             'info',
-            "Siswa sudah check-in dan check-out hari ini: {$student->full_name}"
+            "Siswa sudah absensi penuh hari ini: {$student->full_name} - Kelas {$kelas}"
         );
     }
 }

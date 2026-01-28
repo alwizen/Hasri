@@ -31,6 +31,11 @@ class StudentResource extends Resource
 
     protected static ?string $model = Student::class;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
     public static function form(Schema $schema): Schema

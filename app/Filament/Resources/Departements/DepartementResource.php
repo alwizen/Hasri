@@ -28,11 +28,6 @@ class DepartementResource extends Resource
 
     protected static ?string $label = 'Jabatan';
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
-
     protected static string | UnitEnum | null $navigationGroup = 'Lainnya';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;

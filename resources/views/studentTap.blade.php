@@ -125,34 +125,34 @@
         <!-- Konten Utama -->
         <div class="w-full max-w-md">
             <div class="glass-card rounded-lg shadow-xl p-8">
-                <h1 class="text-2xl font-bold mb-6 text-center text-white text-glass">Input Absen Siswa</h1>
+                <h1 class="text-2xl font-bold mb-6 text-center text-white text-glass">Absensi Siswa</h1>
 
                 <form action="{{ route('studentTap.store') }}" method="POST" class="space-y-4">
                     @csrf
 
                     <div>
                         <label for="nis" class="block text-sm font-medium text-white mb-2 text-glass">
-                            Scan / Masukkan NIS
+                            Scan Kartu Siswa
                         </label>
                         <input id="nis" name="nis" type="text" autofocus autocomplete="off" required
                             class="glass-input block w-full rounded-lg shadow-sm p-3 text-lg text-white placeholder-gray-200"
-                            placeholder="Masukkan NIS">
+                            placeholder="Tempelkan Kartu Anda Di Scanner">
                     </div>
 
                     <div class="flex space-x-3">
                         <button type="submit"
                             class="glass-button-primary flex-1 px-4 py-3 text-white rounded-lg font-semibold shadow-lg transition">
-                            Tap
+                            Submit
                         </button>
                         <button type="button" id="clearBtn"
                             class="glass-button-secondary px-4 py-3 rounded-lg text-white font-semibold transition">
-                            Bersihkan
+                            Clear
                         </button>
                     </div>
                 </form>
 
                 <p class="mt-4 text-xs text-white text-center text-glass opacity-80">
-                    Scanner akan mengisi NIS otomatis. Tekan Enter atau klik Tap untuk mengirim.
+                    Scanner akan mengisi Absensi otomatis Setelah Bunyi Bip.
                 </p>
             </div>
         </div>

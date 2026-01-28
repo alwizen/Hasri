@@ -37,15 +37,15 @@ class AttendanceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocument;
 
-    protected static ?string $navigationLabel = 'Rekap Absensi';
+    protected static ?string $navigationLabel = 'Rekap Absensi Guru';
 
     protected static ?int $navigationSort = 0;
 
     protected static string | UnitEnum | null $navigationGroup = 'Rekapitulasi';
 
-    protected static ?string $modelLabel = 'Absensi';
+    protected static ?string $modelLabel = 'Rekap Absensi Guru';
 
-    protected static ?string $pluralModelLabel = 'Absensi';
+    protected static ?string $pluralModelLabel = 'Rekap Absensi Guru';
 
     public static function form(Schema $schema): Schema
     {
