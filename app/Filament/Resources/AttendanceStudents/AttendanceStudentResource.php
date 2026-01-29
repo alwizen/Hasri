@@ -50,11 +50,18 @@ class AttendanceStudentResource extends Resource
             ->components([
                 Select::make('student_id')
                     ->required()
+                    ->searchable()
+                    ->preload()
+                    ->label('Siswa')
                     ->relationship('student', 'full_name'),
                 DatePicker::make('attendance_date')
-                    ->required(),
+                    ->required()
+                    ->label('Tanggal Absensi'),
                 DateTimePicker::make('check_in_at')
-                    ->required(),
+                    ->required()
+                    ->label('Waktu Masuk'),
+                DateTimePicker::make('check_out_at')
+                    ->label('Waktu Keluar'),
                 Select::make('status')
                     ->label('Status')
                     ->options([
@@ -65,7 +72,6 @@ class AttendanceStudentResource extends Resource
                     ->default('masuk')
                     ->required()
                     ->native(false),
-                DateTimePicker::make('check_out_at'),
             ]);
     }
 

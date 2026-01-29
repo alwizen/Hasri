@@ -28,11 +28,14 @@ class AttendancePerClass extends StatsOverviewWidget
 
         foreach ($classes as $class) {
             $presentCount = AttendanceStudent::whereDate('attendance_date', $today)
+                ->whereIn('status', [
+                    AttendanceStudent::STATUS_MASUK,
+                    AttendanceStudent::STATUS_TERLAMBAT,
+                ])
                 ->whereHas('student', function ($query) use ($class) {
                     $query->where('class_room_id', $class->id);
                 })
                 ->count();
-
 
             $totalStudents = $class->students->count();
 
