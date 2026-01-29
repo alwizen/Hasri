@@ -56,11 +56,10 @@ class SchoolSettingResource extends Resource
                     ->required()
                     ->label('Nama Kepala Sekolah'),
                 FileUpload::make('logo')
-                    ->directory('ttd')
+                    ->directory('img')
                     ->label('Logo Sekolah'),
                 FileUpload::make('principal_signature')
-                    ->directory('ttd')
-                    ->visibility('public')
+                    ->directory('img')
                     ->label('Tanda Tangan Kepala Sekolah'),
             ]);
     }

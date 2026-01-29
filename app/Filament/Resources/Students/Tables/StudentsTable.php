@@ -54,9 +54,9 @@ class StudentsTable
             ])
             ->recordActions([
                 RelationManagerAction::make('lesson-relation-manager')
-                    ->label('Riwayat Kehadiran')
+                    ->label('Absensi')
                     ->slideOver()
-                    ->icon('heroicon-m-plus')
+                    ->icon('heroicon-o-clock')
                     ->relationManager(AttendanceStudentRelationManager::make()),
                 ViewAction::make(),
                 EditAction::make(),

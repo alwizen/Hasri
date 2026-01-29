@@ -20,9 +20,9 @@ class ManageAttendanceStudents extends ManageRecords
         ];
 
         foreach (ClassRoom::orderBy('name')->get() as $class) {
-            $tabs[$class->id] = Tab::make($class->name)
-                ->icon('heroicon-m-bookmark')
-                ->iconPosition(IconPosition::After)
+            $tabs[$class->id] = Tab::make('Kelas ' . $class->name)
+                ->icon('heroicon-m-user-circle')
+                ->iconPosition(IconPosition::Before)
                 ->badge(
                     \App\Models\AttendanceStudent::whereHas('student', function ($query) use ($class) {
                         $query->where('class_room_id', $class->id);

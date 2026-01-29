@@ -22,9 +22,9 @@ class ListStudents extends ListRecords
         ];
 
         foreach (ClassRoom::orderBy('name')->get() as $class) {
-            $tabs[$class->id] = Tab::make($class->name)
-                ->icon('heroicon-m-bookmark')
-                ->iconPosition(IconPosition::After)
+            $tabs[$class->id] = Tab::make('Kelas ' . $class->name)
+                ->icon('heroicon-m-user-circle')
+                ->iconPosition(IconPosition::Before)
                 ->badge(
                     \App\Models\Student::where('class_room_id', $class->id)->count()
                 )
