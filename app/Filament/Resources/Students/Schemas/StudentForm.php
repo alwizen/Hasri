@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Students\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class StudentForm
@@ -13,23 +14,38 @@ class StudentForm
     {
         return $schema
             ->components([
-                TextInput::make('nis')
-                    ->required(),
-                TextInput::make('full_name')
-                    ->required(),
-                TextInput::make('class_room_id')
-                    ->required()
-                    ->numeric(),
-                Textarea::make('address')
-                    ->default(null)
-                    ->columnSpanFull(),
-                TextInput::make('phone')
-                    ->tel()
-                    ->default(null),
-                Select::make('status')
-                    ->options(['active' => 'Active', 'inactive' => 'Inactive'])
-                    ->default('active')
-                    ->required(),
+                Section::make()
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->schema([
+                        TextInput::make('nis')
+                            ->required()
+                            ->label('Kartu Absen')
+                            ->unique(ignoreRecord: true),
+                        TextInput::make('full_name')
+                            ->required()
+                            ->label('Nama Lengkap'),
+                        Select::make('class_room_id')
+                            ->required()
+                            ->relationship('classRoom', 'name'),
+                    ]),
+                Section::make()
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('phone')
+                            ->label('No. Telepon'),
+                        Textarea::make('address')
+                            ->label('Alamat')
+                            ->rows(3),
+                        Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'active' => 'Aktif',
+                                'inactive' => 'Tidak Aktif',
+                            ])
+                            ->default('active')
+                            ->required(),
+                    ]),
             ]);
     }
 }

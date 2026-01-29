@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RfidAttendanceController;
 use App\Http\Controllers\StudentAttendanceController;
+use App\Http\Controllers\StudentController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -16,3 +17,6 @@ Route::get('tap', [StudentAttendanceController::class, 'index'])
 
 Route::post('tap', [StudentAttendanceController::class, 'store'])
     ->name('studentTap.store');
+
+Route::get('/siswa', [StudentController::class, 'create'])->name('siswa.create');
+Route::post('/siswa', [StudentController::class, 'store'])->name('siswa.store');
